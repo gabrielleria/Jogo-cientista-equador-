@@ -1,0 +1,1029 @@
+/* ==================================================================
+   MAR DE FIGURINHAS - ESTILO
+   Visual retrô de videogame, pixel art 2D, bordas quadradas.
+   ================================================================== */
+
+/* ---------- 1. CORES, FONTES E BASE ---------- */
+:root {
+  /* Paleta oficial do projeto */
+  --azul-escuro: #071B33;   /* fundo principal */
+  --azul-profundo: #103F5C; /* painéis e cartões */
+  --ciano: #28C7D9;         /* botões e destaques */
+  --verde-agua: #70E1C1;    /* progresso e elementos marinhos */
+  --amarelo: #FFD166;       /* recompensas e figurinhas desbloqueadas */
+  --branco: #F2F7FC;        /* textos */
+  --coral: #FF6B6B;         /* respostas incorretas */
+
+  /* Tons de apoio (sombras e brilhos dos botões e molduras) */
+  --azul-medio: #0B2C4A;
+  --ciano-claro: #9AF3FF;
+  --ciano-sombra: #1792A3;
+  --amarelo-sombra: #B8861F;
+
+  /* Títulos: monoespaçada em negrito (aparência de pixel, sem baixar fonte).
+     Textos: fonte do sistema, muito legível. */
+  --fonte-titulo: "Courier New", Courier, ui-monospace, Consolas, monospace;
+  --fonte-texto: "Trebuchet MS", "Segoe UI", Verdana, Arial, sans-serif;
+
+  --areia: 6vh; /* altura do chão de areia */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+[hidden] { display: none !important; }
+
+/* Tudo é medido em "rem", e o rem acompanha o tamanho da janela:
+   assim o jogo se adapta ao notebook sem cortar elementos. */
+html { font-size: clamp(11px, calc(2vmin + 0.35vw), 22px); }
+
+html, body { height: 100%; }
+
+body {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  position: relative;
+  background: var(--azul-escuro);
+  color: var(--branco);
+  font-family: var(--fonte-texto);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+button { font-family: inherit; }
+
+:focus-visible {
+  outline: 0.3rem solid var(--amarelo);
+  outline-offset: 0.2rem;
+}
+
+/* ---------- 2. CENÁRIO DO OCEANO ---------- */
+#oceano {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  /* Faixas de azul em degraus (sem degradê suave = visual de pixel art) */
+  background: linear-gradient(to bottom,
+    #1A5F82 0 14%,
+    #145070 14% 30%,
+    #103F5C 30% 48%,
+    #0B2C4A 48% 70%,
+    #071B33 70% 100%);
+}
+
+/* Raios de luz em blocos */
+.raios span {
+  position: absolute;
+  top: 0;
+  height: 70%;
+  background: #F2F7FC;
+  opacity: 0.07;
+  animation: raio 3.2s steps(1) infinite;
+}
+.raios span:nth-child(1) { left: 8%;  width: 12%; clip-path: polygon(30% 0, 100% 0, 60% 100%, 0 100%); }
+.raios span:nth-child(2) { left: 42%; width: 9%;  clip-path: polygon(30% 0, 100% 0, 60% 100%, 0 100%); animation-delay: -1.2s; }
+.raios span:nth-child(3) { left: 72%; width: 14%; clip-path: polygon(30% 0, 100% 0, 60% 100%, 0 100%); animation-delay: -2.2s; }
+
+@keyframes raio {
+  0%, 49%   { opacity: 0.06; }
+  50%, 100% { opacity: 0.13; }
+}
+
+/* Bolhas quadradas subindo */
+.bolha {
+  position: absolute;
+  bottom: -2rem;
+  background: rgba(242, 247, 252, 0.14);
+  border: 0.15rem solid rgba(242, 247, 252, 0.55);
+  animation: subir var(--dur, 12s) steps(60) infinite;
+}
+
+@keyframes subir {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-115vh); }
+}
+
+/* Peixes, tartaruga e caranguejo decorativos */
+.nadador {
+  position: absolute;
+  left: 0;
+  width: var(--larg, 5rem);
+}
+
+.nadador.direita  { animation: nadar-direita  var(--dur, 30s) steps(100) var(--atraso, 0s) infinite; }
+.nadador.esquerda { animation: nadar-esquerda var(--dur, 30s) steps(100) var(--atraso, 0s) infinite; }
+.nadador.esquerda svg { transform: scaleX(-1); }
+
+.nadador .corpo { animation: flutuar 1.2s steps(1) infinite; }
+.nadador svg { display: block; width: 100%; height: auto; }
+
+@keyframes nadar-direita {
+  from { transform: translateX(-25vw); }
+  to   { transform: translateX(115vw); }
+}
+@keyframes nadar-esquerda {
+  from { transform: translateX(115vw); }
+  to   { transform: translateX(-25vw); }
+}
+@keyframes flutuar {
+  0%, 49%   { transform: translateY(0); }
+  50%, 100% { transform: translateY(0.3rem); }
+}
+
+/* Caranguejo andando de lado no chão */
+.nadador.chao {
+  bottom: calc(var(--areia) - 0.3rem);
+  animation: andar var(--dur, 40s) steps(50) var(--atraso, 0s) infinite alternate;
+}
+@keyframes andar {
+  from { transform: translateX(6vw); }
+  to   { transform: translateX(88vw); }
+}
+
+/* Corais e algas fixos no fundo */
+.fixo {
+  position: absolute;
+  bottom: calc(var(--areia) - 0.2rem);
+}
+.fixo svg { display: block; height: 100%; width: auto; }
+.fixo.alga { animation: balanco 1.6s steps(1) infinite; }
+
+@keyframes balanco {
+  0%, 49%   { transform: translateX(0); }
+  50%, 100% { transform: translateX(0.25rem); }
+}
+
+.areia {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: var(--areia);
+  background: #A98249;
+  border-top: 0.6rem solid #C9A15B;
+}
+
+/* Nas telas do quiz, os bichos nadando saem de cena para não distrair */
+body[data-tela="quiz"] .nadador,
+body[data-tela="resposta"] .nadador { display: none; }
+
+/* ---------- 3. ESTRUTURA GERAL DAS TELAS ---------- */
+#jogo {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2vh 3vw calc(var(--areia) + 1vh);
+  overflow-y: auto;
+}
+
+.tela {
+  display: none;
+  flex: 1 0 auto;
+  width: 100%;
+  max-width: 58rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  justify-content: safe center;
+  gap: 1rem;
+}
+
+.tela.ativa {
+  display: flex;
+  animation: entrar 0.3s steps(3) both;
+}
+
+@keyframes entrar {
+  from { opacity: 0; transform: translateY(1rem); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Painel: cartão azul com borda quadrada e sombra dura */
+.painel {
+  background: var(--azul-profundo);
+  border: 0.3rem solid var(--ciano);
+  box-shadow: 0 0.4rem 0 0 var(--azul-escuro), inset 0 0 0 0.2rem var(--azul-medio);
+  padding: 1rem 1.5rem;
+}
+
+/* ---------- 4. BOTÕES ---------- */
+.botao {
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: var(--azul-escuro);
+  background: var(--ciano);
+  border: 0.25rem solid var(--azul-escuro);
+  box-shadow:
+    inset 0.25rem 0.25rem 0 var(--ciano-claro),
+    inset -0.25rem -0.4rem 0 var(--ciano-sombra),
+    0 0.45rem 0 0 var(--azul-escuro);
+  cursor: pointer;
+  transition: none;
+}
+.botao:hover  { background: #52D9E8; }
+.botao:active {
+  transform: translateY(0.35rem);
+  box-shadow:
+    inset 0.25rem 0.25rem 0 var(--ciano-claro),
+    inset -0.25rem -0.4rem 0 var(--ciano-sombra),
+    0 0.1rem 0 0 var(--azul-escuro);
+}
+
+.botao-grande {
+  font-size: 2.2rem;
+  padding: 0.6rem 3rem;
+  min-width: 17rem;
+}
+
+/* Botão que "flutua" quadro a quadro, chamando para o clique */
+.flutuando { animation: pular 1s steps(1) infinite; }
+@keyframes pular {
+  0%, 49%   { transform: translateY(0); }
+  50%, 100% { transform: translateY(-0.35rem); }
+}
+.flutuando:active { animation: none; transform: translateY(0.35rem); }
+
+/* Seta de voltar: pequena, no canto superior esquerdo */
+.botao-voltar {
+  position: fixed;
+  top: 0.6rem;
+  left: 0.6rem;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  padding: 0.4rem;
+}
+.botao-voltar svg { display: block; width: 100%; height: 100%; }
+
+/* Cronômetro: pequeno, no canto superior direito, só durante o quiz */
+.cronometro {
+  position: fixed;
+  top: 0.6rem;
+  right: 0.8rem;
+  z-index: 5;
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.2rem 0.7rem;
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  background: var(--azul-medio);
+  border: 0.2rem solid var(--azul-profundo);
+  box-shadow: 0 0.25rem 0 0 var(--azul-escuro);
+}
+.cron-rotulo { font-size: 0.9rem; letter-spacing: 0.15em; color: var(--verde-agua); }
+.cron-valor  { font-size: 1.4rem; color: var(--amarelo); }
+body[data-tela="quiz"] .cronometro,
+body[data-tela="resposta"] .cronometro { display: flex; }
+
+/* ---------- 5. TELA 1 - MENU ---------- */
+.titulo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  letter-spacing: 0.06em;
+}
+.titulo .linha1 {
+  font-size: 3.2rem;
+  color: var(--ciano);
+  text-shadow: 0.1em 0.1em 0 var(--azul-escuro), 0.05em 0.05em 0 var(--azul-escuro);
+}
+.titulo .linha2 {
+  font-size: 5.2rem;
+  color: var(--amarelo);
+  text-shadow: 0.08em 0.08em 0 var(--azul-escuro), 0.04em 0.04em 0 var(--azul-escuro);
+}
+
+.subtitulo {
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 1.5rem;
+  letter-spacing: 0.3em;
+  color: var(--verde-agua);
+  text-shadow: 0.1em 0.1em 0 var(--azul-escuro);
+}
+
+.frase {
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  max-width: 40rem;
+}
+
+/* ---------- 5b. TELA 0 - CAPA DE APRESENTAÇÃO ---------- */
+#tela-capa { max-width: 64rem; gap: 0.8rem; }
+
+.capa-topo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+}
+.capa-selo {
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 1.15rem;
+  letter-spacing: 0.25em;
+  color: var(--verde-agua);
+  text-shadow: 0.1em 0.1em 0 var(--azul-escuro);
+}
+.capa-tema {
+  padding: 0.2rem 1.6rem;
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 2rem;
+  letter-spacing: 0.06em;
+  color: var(--branco);
+  background: var(--azul-profundo);
+  border: 0.25rem solid var(--ciano);
+  box-shadow: 0 0.35rem 0 0 var(--azul-escuro);
+}
+
+.capa-centro {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2.2rem;
+}
+.capa-titulo-bloco {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+#tela-capa .titulo .linha1 { font-size: 2.6rem; }
+#tela-capa .titulo .linha2 { font-size: 4.4rem; }
+
+/* Bandeira do Equador: moldura dourada igual à das figurinhas */
+.bandeira {
+  flex: none;
+  width: 10.5rem;
+  padding: 0.35rem;
+  background: var(--azul-medio);
+  border: 0.3rem solid var(--amarelo);
+  box-shadow: 0 0 0 0.2rem var(--amarelo-sombra), 0 0.4rem 0 0.2rem var(--azul-escuro);
+}
+.bandeira svg { display: block; width: 100%; height: auto; }
+
+.capa-cientista {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.1rem;
+}
+.capa-cientista small {
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 1.05rem;
+  letter-spacing: 0.2em;
+  color: var(--verde-agua);
+  text-shadow: 0.1em 0.1em 0 var(--azul-escuro);
+}
+.capa-cientista strong {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--branco);
+  text-shadow: 0.08em 0.08em 0 var(--azul-escuro);
+}
+
+.capa-grupo {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.7rem 1.4rem 0.9rem;
+}
+.capa-grupo-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 0.2rem solid var(--azul-medio);
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+}
+.capa-rotulo {
+  font-size: 1.15rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--verde-agua);
+}
+.capa-turma {
+  font-size: 1.6rem;
+  color: var(--amarelo);
+}
+.capa-nomes {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  justify-content: space-between;
+  gap: 0.5rem 1.2rem;
+}
+.capa-nomes li {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.capa-nomes li::before {
+  content: "";
+  flex: none;
+  width: 0.6rem;
+  height: 0.6rem;
+  background: var(--verde-agua);
+}
+
+/* ---------- 5c. TELA DE NOME DO JOGADOR ---------- */
+.botao-amarelo {
+  background: var(--amarelo);
+  box-shadow:
+    inset 0.25rem 0.25rem 0 #FFE9A8,
+    inset -0.25rem -0.4rem 0 var(--amarelo-sombra),
+    0 0.45rem 0 0 var(--azul-escuro);
+}
+.botao-amarelo:hover { background: #FFDD8A; }
+.botao-amarelo:active {
+  box-shadow:
+    inset 0.25rem 0.25rem 0 #FFE9A8,
+    inset -0.25rem -0.4rem 0 var(--amarelo-sombra),
+    0 0.1rem 0 0 var(--azul-escuro);
+}
+.botao-medio {
+  font-size: 1.6rem;
+  padding: 0.5rem 1.8rem;
+}
+
+.painel-nome {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1.2rem 1.6rem 1rem;
+}
+.titulo-nome {
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 2.8rem;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-align: center;
+  color: var(--amarelo);
+  text-shadow: 0.08em 0.08em 0 var(--azul-escuro);
+}
+.dica-nome {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+}
+.campo-nome {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 2.4rem;
+  text-align: center;
+  color: var(--branco);
+  background: var(--azul-escuro);
+  border: 0.3rem solid var(--ciano);
+  border-radius: 0;
+  caret-color: var(--amarelo);
+  user-select: text;
+  -webkit-user-select: text;
+}
+.campo-nome::placeholder { color: #5F93B3; }
+.aviso-nome {
+  min-height: 1.8rem;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--coral);
+}
+
+/* ---------- 6. TELA 2 - QUIZ ---------- */
+.topo-quiz {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rotulo-pergunta {
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 1.6rem;
+  letter-spacing: 0.1em;
+  color: var(--verde-agua);
+  text-shadow: 0.08em 0.08em 0 var(--azul-escuro);
+}
+
+.barra-progresso {
+  display: grid;
+  grid-template-columns: repeat(var(--n, 8), 1fr);
+  gap: 0.4rem;
+  height: 1.4rem;
+}
+.barra-progresso .bloco {
+  background: var(--azul-medio);
+  border: 0.18rem solid var(--azul-profundo);
+}
+.barra-progresso .bloco.feito {
+  background: var(--verde-agua);
+  border-color: #3FB898;
+}
+.barra-progresso .bloco.atual {
+  background: var(--ciano);
+  border-color: var(--ciano-claro);
+  animation: piscar-bloco 0.8s steps(1) infinite;
+}
+@keyframes piscar-bloco {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0.45; }
+}
+
+.pergunta {
+  width: 100%;
+  min-height: 5.6rem;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+.pergunta p {
+  font-size: 2.1rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.alternativas {
+  width: 100%;
+  display: grid;
+  gap: 0.8rem;
+}
+.alternativas.duas-colunas { grid-template-columns: 1fr 1fr; }
+
+/* Bloqueia cliques logo que a pergunta aparece (evita clique duplo acidental) */
+.alternativas.travado { pointer-events: none; }
+
+.alternativa {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 3.7rem;
+  padding: 0.4rem 1rem;
+  text-align: left;
+  font-size: 1.7rem;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--branco);
+  background: var(--azul-profundo);
+  border: 0.25rem solid var(--ciano);
+  box-shadow: 0 0.4rem 0 0 var(--azul-escuro);
+  cursor: pointer;
+}
+.alternativa .letra {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 1.6rem;
+  color: var(--azul-escuro);
+  background: var(--amarelo);
+}
+.alternativa:hover:not(:disabled) {
+  background: #18587F;
+  transform: translateY(-0.15rem);
+}
+.alternativa:active:not(:disabled) {
+  transform: translateY(0.3rem);
+  box-shadow: 0 0.1rem 0 0 var(--azul-escuro);
+}
+
+/* Estados depois do clique */
+.alternativa:disabled { cursor: default; }
+.alternativa.correta {
+  color: var(--azul-escuro);
+  background: var(--verde-agua);
+  border-color: var(--branco);
+  animation: piscar-resposta 0.4s steps(1) 3;
+}
+.alternativa.errada {
+  color: var(--azul-escuro);
+  background: var(--coral);
+  border-color: var(--branco);
+}
+.alternativa.apagada { opacity: 0.4; }
+
+@keyframes piscar-resposta {
+  0%, 49%   { transform: translateY(0); }
+  50%, 100% { transform: translateY(-0.2rem); }
+}
+
+/* ---------- 7. TELA 3 - RESPOSTA E RECOMPENSA ---------- */
+#painel-resultado {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 1.8rem;
+  padding: 1rem 1.6rem;
+}
+#painel-resultado.sem-figurinha { grid-template-columns: 1fr; }
+#painel-resultado.acerto { border-color: var(--verde-agua); }
+#painel-resultado.erro   { border-color: var(--coral); }
+
+.resultado-texto { display: flex; flex-direction: column; gap: 0.8rem; }
+
+.resultado-texto h2 {
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 3.4rem;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  text-shadow: 0.08em 0.08em 0 var(--azul-escuro);
+}
+#painel-resultado.acerto h2 { color: var(--verde-agua); }
+#painel-resultado.erro h2   { color: var(--coral); }
+
+.aviso {
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 1.5rem;
+  color: var(--amarelo);
+}
+.certa {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.2;
+  padding: 0.4rem 0.8rem;
+  color: var(--azul-escuro);
+  background: var(--verde-agua);
+}
+.explicacao {
+  font-size: 1.55rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* Palco da figurinha: onde ela "cai" e brilha */
+.palco {
+  position: relative;
+  width: 14rem;
+  height: 15rem;
+  display: grid;
+  place-items: center;
+}
+.palco-ganhou .figurinha { animation: cair 1s steps(1) both; }
+
+@keyframes cair {
+  0%   { transform: translateY(-10rem); opacity: 0; }
+  15%  { transform: translateY(-7rem);  opacity: 1; }
+  30%  { transform: translateY(-4rem); }
+  45%  { transform: translateY(0); }
+  58%  { transform: translateY(-2rem); }
+  70%  { transform: translateY(0); }
+  82%  { transform: translateY(-0.7rem); }
+  100% { transform: translateY(0); }
+}
+
+/* Estrelinhas de pixel (formato de "+") piscando em volta */
+.faisca {
+  position: absolute;
+  width: 0.55rem;
+  height: 0.55rem;
+  color: var(--amarelo);
+  background: currentColor;
+  box-shadow:
+    0.55rem 0 currentColor, -0.55rem 0 currentColor,
+    0 0.55rem currentColor, 0 -0.55rem currentColor;
+  animation: piscar-faisca 0.9s steps(1) infinite backwards;
+}
+.faisca:nth-child(even) { color: var(--branco); }
+
+@keyframes piscar-faisca {
+  0%   { opacity: 0; transform: scale(0.4); }
+  25%  { opacity: 1; transform: scale(1); }
+  50%  { opacity: 1; transform: scale(1.5); }
+  75%  { opacity: 0.5; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.4); }
+}
+
+/* ---------- 8. FIGURINHAS (usadas em todas as telas) ---------- */
+.figurinha {
+  --tam: 6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.moldura {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--tam);
+  height: var(--tam);
+  padding: calc(var(--tam) * 0.1);
+  background: var(--azul-medio);
+  border: 0.3rem solid #3A6A8A;
+  box-shadow: 0 0 0 0.2rem var(--azul-escuro);
+}
+.moldura .sprite { display: block; width: 100%; height: 100%; }
+
+/* Conquistada: colorida, com moldura dourada que brilha */
+.figurinha.conquistada .moldura {
+  background: #1B6A93;
+  border-color: var(--amarelo);
+  box-shadow: 0 0 0 0.2rem var(--amarelo-sombra), 0 0.4rem 0 0.2rem var(--azul-escuro);
+}
+.palco-ganhou .moldura { animation: brilho 0.7s steps(1) 1s infinite; }
+
+@keyframes brilho {
+  0%, 49%   { box-shadow: 0 0 0 0.2rem var(--amarelo-sombra), 0 0 0 0.5rem rgba(255, 209, 102, 0.35); }
+  50%, 100% { box-shadow: 0 0 0 0.2rem var(--amarelo-sombra), 0 0 0 0.8rem rgba(255, 209, 102, 0.6); }
+}
+
+/* Bloqueada: silhueta escura com "?" */
+.interrogacao {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: calc(var(--tam) * 0.5);
+  color: #4D86AD;
+}
+
+.nome {
+  min-width: calc(var(--tam) * 0.95);
+  padding: 0.2rem 0.5rem;
+  text-align: center;
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 1.15rem;
+  color: var(--azul-escuro);
+  background: var(--amarelo);
+}
+.figurinha.bloqueada .nome {
+  color: #8DB6D1;
+  background: var(--azul-profundo);
+}
+
+/* Tamanhos */
+.figurinha.mini   { --tam: 3.4rem; }
+.figurinha.mini .moldura { border-width: 0.2rem; }
+.figurinha.mini .nome { display: none; }
+.figurinha.media  { --tam: 6.4rem; }
+.album .nome { font-size: 1rem; }
+.figurinha.grande { --tam: 10rem; }
+.figurinha.grande .nome { font-size: 1.5rem; }
+
+/* Pulo da figurinha que acabou de ser conquistada na faixa */
+.figurinha.nova .moldura { animation: pop 0.9s steps(1); }
+@keyframes pop {
+  0%   { transform: scale(1); }
+  20%  { transform: scale(1.35); }
+  40%  { transform: scale(1); }
+  60%  { transform: scale(1.35); }
+  80%  { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+/* ---------- 9. TELA 4 - FAIXA DA COLEÇÃO (durante o quiz) ---------- */
+#faixa-colecao {
+  display: none;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.4rem;
+  margin-top: 0.7rem;
+  padding: 0.5rem 1.2rem;
+  background: var(--azul-medio);
+  border: 0.25rem solid var(--azul-profundo);
+  box-shadow: 0 0.35rem 0 0 var(--azul-escuro);
+}
+body[data-tela="quiz"] #faixa-colecao,
+body[data-tela="resposta"] #faixa-colecao { display: flex; }
+
+.faixa-slots { display: flex; gap: 0.6rem; }
+.faixa-contador {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--amarelo);
+}
+
+/* ---------- 10. TELA 5 - RESULTADO FINAL ---------- */
+#tela-final { max-width: 64rem; gap: 0.7rem; }
+
+.titulo-final {
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 3rem;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  color: var(--amarelo);
+  text-shadow: 0.08em 0.08em 0 var(--azul-escuro);
+}
+.final-linha {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+}
+.final-chip {
+  padding: 0.1rem 0.8rem;
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 1.25rem;
+  letter-spacing: 0.08em;
+  color: var(--verde-agua);
+  background: var(--azul-profundo);
+  border: 0.2rem solid var(--ciano);
+}
+.final-chip b { font-size: 1.5rem; color: var(--amarelo); letter-spacing: 0.04em; }
+.final-jogador {
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 1.7rem;
+  letter-spacing: 0.05em;
+  color: var(--branco);
+  text-shadow: 0.08em 0.08em 0 var(--azul-escuro);
+}
+.final-contagem {
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 2.1rem;
+  color: var(--verde-agua);
+  text-shadow: 0.08em 0.08em 0 var(--azul-escuro);
+}
+.album {
+  display: grid;
+  grid-template-columns: repeat(var(--colunas, 8), auto);
+  gap: 1rem 0.8rem;
+  justify-content: center;
+  padding: 1rem 1.4rem 0.8rem;
+  background: var(--azul-medio);
+  border: 0.25rem solid var(--azul-profundo);
+  box-shadow: 0 0.4rem 0 0 var(--azul-escuro);
+}
+.final-mensagem {
+  font-size: 1.7rem;
+  font-weight: 800;
+  line-height: 1.25;
+  text-align: center;
+  max-width: 44rem;
+}
+
+/* ---------- 10b. FINAL: botões lado a lado ---------- */
+.final-botoes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.8rem 1.4rem;
+}
+
+/* ---------- 10c. TELA 6 - RANKING ---------- */
+#tela-ranking { max-width: 52rem; gap: 0.6rem; }
+
+.titulo-ranking {
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 2.8rem;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  color: var(--amarelo);
+  text-shadow: 0.08em 0.08em 0 var(--azul-escuro);
+}
+.painel-ranking {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.7rem 1rem 0.8rem;
+}
+.cab-ranking,
+.linha-rank {
+  display: grid;
+  grid-template-columns: 2.8rem 1fr 7rem 7rem;
+  align-items: center;
+  gap: 0.8rem;
+}
+.cab-ranking {
+  padding: 0 1.15rem;
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 1.05rem;
+  letter-spacing: 0.15em;
+  color: var(--verde-agua);
+}
+.cab-ranking .dir { text-align: right; }
+
+.lista-ranking { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.linha-rank {
+  padding: 0.2rem 0.9rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  background: var(--azul-medio);
+  border: 0.25rem solid var(--azul-profundo);
+}
+.linha-rank .pos {
+  display: grid;
+  place-items: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 1.4rem;
+  color: var(--azul-escuro);
+  background: var(--ciano);
+}
+.linha-rank.pos-1 .pos { background: var(--amarelo); }
+.linha-rank.pos-2 .pos { background: var(--branco); }
+.linha-rank.pos-3 .pos { background: #E0872A; }
+
+.linha-rank .nome-rank {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.linha-rank .pts,
+.linha-rank .tempo {
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  text-align: right;
+}
+.linha-rank .pts { color: var(--amarelo); }
+.linha-rank .tempo { color: var(--verde-agua); }
+
+/* Posições ainda sem resultado */
+.linha-rank.vazia { opacity: 0.55; }
+.linha-rank.vazia .pos { color: #5F93B3; background: var(--azul-profundo); }
+
+/* Resultado da partida que acabou de terminar */
+.linha-rank.destaque { background: #18587F; border-color: var(--amarelo); }
+.voce {
+  margin-left: 0.6rem;
+  padding: 0 0.4rem;
+  font-family: var(--fonte-titulo);
+  font-size: 0.95rem;
+  color: var(--azul-escuro);
+  background: var(--amarelo);
+  vertical-align: middle;
+}
+
+/* Telas estreitas: o álbum passa para 3 colunas */
+@media (max-width: 1000px) {
+  .album { grid-template-columns: repeat(4, auto); }
+  #tela-final { gap: 0.5rem; }
+  .final-botoes .botao-grande { font-size: 1.7rem; padding: 0.5rem 1.6rem; min-width: 0; }
+  .album { gap: 0.6rem 0.8rem; padding: 0.7rem 1rem 0.5rem; }
+  .figurinha.media { --tam: 4.8rem; }
+  .titulo-final { font-size: 2.4rem; }
+  .final-contagem { font-size: 1.8rem; }
+  .final-mensagem { font-size: 1.5rem; }
+}
+
+@media (max-width: 960px) {
+  .capa-nomes { grid-template-columns: repeat(2, auto); }
+  .capa-centro { gap: 1.4rem; }
+  .bandeira { width: 8rem; }
+}
+
+/* Telas muito baixas: reduz um pouco os elementos para nada ser cortado */
+@media (max-height: 560px) {
+  .titulo .linha2 { font-size: 4rem; }
+  .pergunta { min-height: 5.5rem; }
+  .palco { height: 13rem; width: 12rem; }
+  .figurinha.grande { --tam: 8.5rem; }
+  #tela-capa .titulo .linha2 { font-size: 3.6rem; }
+  .bandeira { width: 8.5rem; }
+}
+
+/* ---------- 11. ACESSIBILIDADE: MOVIMENTO REDUZIDO ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .bolha, .nadador, .nadador .corpo, .fixo.alga, .raios span, .flutuando {
+    animation: none;
+  }
+}

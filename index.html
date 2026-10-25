@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mar de Figurinhas - Aventura Oceânica</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body data-tela="capa">
+
+  <!-- ============================================================
+       CENÁRIO DE FUNDO (decorativo, preenchido pelo script.js)
+       ============================================================ -->
+  <div id="oceano" aria-hidden="true">
+    <div class="raios"><span></span><span></span><span></span></div>
+    <div id="bolhas"></div>
+    <div id="nadadores"></div>
+    <div id="fundo-marinho"></div>
+    <div class="areia"></div>
+  </div>
+
+  <!-- Cronômetro (aparece só durante o quiz; o script.js controla o tempo) -->
+  <div id="cronometro" class="cronometro" aria-label="Tempo de jogo">
+    <span class="cron-rotulo">TEMPO</span>
+    <span id="cron-valor" class="cron-valor">00:00</span>
+  </div>
+
+  <!-- Seta de voltar (o script.js decide em quais telas ela aparece) -->
+  <button id="btn-voltar" class="botao botao-voltar" type="button" aria-label="Voltar" title="Voltar" hidden></button>
+
+  <!-- ============================================================
+       JOGO
+       ============================================================ -->
+  <main id="jogo">
+
+    <!-- TELA 0 - CAPA DE APRESENTAÇÃO (primeira tela ao abrir o jogo) -->
+    <section id="tela-capa" class="tela ativa">
+      <div class="capa-topo">
+        <p class="capa-selo">PROJETO DE FEIRA DE CIÊNCIAS</p>
+        <p class="capa-tema">Cientistas do Equador</p>
+      </div>
+
+      <div class="capa-centro">
+        <div id="bandeira-equador" class="bandeira" role="img" aria-label="Bandeira do Equador"></div>
+        <div class="capa-titulo-bloco">
+          <h1 class="titulo">
+            <span class="linha1">MAR DE</span>
+            <span class="linha2">FIGURINHAS</span>
+          </h1>
+          <p class="capa-cientista">
+            <small>Cientista homenageada</small>
+            <strong>Patricia Castillo Briceño</strong>
+          </p>
+        </div>
+      </div>
+
+      <div class="capa-grupo painel">
+        <div class="capa-grupo-topo">
+          <span class="capa-rotulo">Integrantes</span>
+          <span class="capa-turma">Turma: 2º ano A</span>
+        </div>
+        <ul class="capa-nomes">
+          <li>Gabriel Luiz</li>
+          <li>Gabriel Siqueira</li>
+          <li>Julia</li>
+          <li>Isabela Veiga</li>
+          <li>Beatriz Silva</li>
+          <li>Beatriz Cardoso</li>
+          <li>João Lucas</li>
+          <li>Nicole</li>
+        </ul>
+      </div>
+
+      <button id="btn-iniciar" class="botao botao-grande flutuando" type="button">INICIAR JOGO</button>
+    </section>
+
+    <!-- TELA 1 - MENU INICIAL -->
+    <section id="tela-menu" class="tela">
+      <h1 class="titulo">
+        <span class="linha1">MAR DE</span>
+        <span class="linha2">FIGURINHAS</span>
+      </h1>
+      <p class="subtitulo">AVENTURA OCEÂNICA</p>
+      <p class="frase painel">Responda às perguntas e colecione figurinhas marinhas!</p>
+      <button id="btn-jogar" class="botao botao-grande flutuando" type="button">JOGAR</button>
+    </section>
+
+    <!-- TELA 1B - NOME DO JOGADOR (antes do quiz) -->
+    <section id="tela-nome" class="tela">
+      <div class="painel painel-nome">
+        <h2 class="titulo-nome">QUAL É O SEU NOME?</h2>
+        <p class="dica-nome">Digite seu nome ou sorteie um apelido do oceano!</p>
+        <input id="campo-nome" class="campo-nome" type="text" maxlength="18"
+               placeholder="Seu nome" autocomplete="off" spellcheck="false"
+               aria-label="Nome do jogador">
+        <button id="btn-sortear" class="botao botao-amarelo botao-medio" type="button">SORTEAR NOME</button>
+        <p id="aviso-nome" class="aviso-nome" role="alert"></p>
+      </div>
+      <button id="btn-comecar" class="botao botao-grande" type="button">JOGAR</button>
+    </section>
+
+    <!-- TELA 2 - QUIZ (uma pergunta por vez) -->
+    <section id="tela-quiz" class="tela">
+      <header class="topo-quiz">
+        <div id="rotulo-pergunta" class="rotulo-pergunta">PERGUNTA 1 DE 8</div>
+        <div id="barra-progresso" class="barra-progresso"></div>
+      </header>
+      <div class="painel pergunta">
+        <p id="texto-pergunta"></p>
+      </div>
+      <div id="alternativas" class="alternativas"></div>
+    </section>
+
+    <!-- TELA 3 - RESPOSTA E RECOMPENSA -->
+    <section id="tela-resposta" class="tela">
+      <div id="painel-resultado" class="painel">
+        <div id="palco" class="palco"></div>
+        <div class="resultado-texto">
+          <h2 id="titulo-resultado"></h2>
+          <p id="aviso-figurinha" class="aviso"></p>
+          <p id="resposta-certa" class="certa" hidden></p>
+          <p id="explicacao" class="explicacao"></p>
+        </div>
+      </div>
+      <button id="btn-proxima" class="botao botao-grande" type="button">PRÓXIMA</button>
+    </section>
+
+    <!-- TELA 5 - RESULTADO FINAL (com a coleção completa, Tela 4) -->
+    <section id="tela-final" class="tela">
+      <h2 class="titulo-final">FIM DE JOGO!</h2>
+      <div class="final-linha">
+        <span id="final-jogador" class="final-jogador"></span>
+        <span class="final-chip">PONTOS <b id="final-pontos">0</b></span>
+        <span class="final-chip">TEMPO <b id="final-tempo">00:00</b></span>
+      </div>
+      <p id="final-contagem" class="final-contagem"></p>
+      <div id="album-final" class="album"></div>
+      <p id="final-mensagem" class="final-mensagem painel"></p>
+      <div class="final-botoes">
+        <button id="btn-jogar-novamente" class="botao botao-grande" type="button">JOGAR NOVAMENTE</button>
+        <button id="btn-ranking" class="botao botao-amarelo botao-grande" type="button">VER RANKING</button>
+      </div>
+    </section>
+
+    <!-- TELA 6 - RANKING (os 5 melhores resultados) -->
+    <section id="tela-ranking" class="tela">
+      <h2 class="titulo-ranking">RANKING</h2>
+      <div class="painel painel-ranking">
+        <div class="cab-ranking">
+          <span>#</span><span>JOGADOR</span><span class="dir">PONTOS</span><span class="dir">TEMPO</span>
+        </div>
+        <div id="lista-ranking" class="lista-ranking"></div>
+      </div>
+      <button id="btn-ranking-menu" class="botao botao-grande" type="button">MENU</button>
+    </section>
+
+    <!-- TELA 4 - COLEÇÃO (faixa com as figurinhas, visível durante o quiz) -->
+    <footer id="faixa-colecao" aria-label="Coleção de figurinhas">
+      <div id="faixa-slots" class="faixa-slots"></div>
+      <div id="faixa-contador" class="faixa-contador">0 de 8 figurinhas</div>
+    </footer>
+
+  </main>
+
+  <noscript>
+    <p style="position:relative;z-index:2;padding:2rem;color:#F2F7FC;font:20px sans-serif">
+      Ative o JavaScript do navegador para jogar.
+    </p>
+  </noscript>
+
+  <script src="script.js"></script>
+</body>
+</html>
