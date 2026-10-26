@@ -156,7 +156,7 @@ const PIXELS_BAIACU = [
   "....S..SS..S....",
   "....KKKKKKKK....",
   "..SKYYYYYYYYKS..",
-  "..KYHHYYYYYYYK..",
+  "..KYYYYYYYYYYK..",
   ".SKYEBYYYYBEYKS.",
   "..KYEBYYYYBEYK..",
   "..KYPYYMMYYPYK..",
