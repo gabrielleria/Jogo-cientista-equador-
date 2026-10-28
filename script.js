@@ -925,30 +925,59 @@ function gravarNomesGuardados(lista) {
   }
 }
 
-/** Devolve todos os nomes já utilizados. */
+
+/** Devolve os nomes já utilizados no navegador e no ranking online. */
 async function listarNomesUtilizados() {
-  return lerNomesGuardados();
+  const nomesLocais = lerNomesGuardados();
+
+  const resposta = await pedidoSupabase(
+    SUPABASE_TABELA + "?select=nome",
+    { method: "GET", headers: {} }
+  );
+
+  const registros = await resposta.json();
+  const nomesOnline = registros.map(function (registro) {
+    return registro.nome;
+  });
+
+  return [...new Set([...nomesLocais, ...nomesOnline])];
 }
 
-/** Este nome já foi utilizado nesta sessão? */
+/** Verifica se o nome já existe localmente ou no ranking online. */
 async function nomeJaUtilizado(nome) {
   const chave = normalizarNome(nome);
-  return lerNomesGuardados().some(function (usado) { return normalizarNome(usado) === chave; });
+  const nomes = await listarNomesUtilizados();
+
+  return nomes.some(function (usado) {
+    return normalizarNome(usado) === chave;
+  });
 }
 
-/** Marca o nome como utilizado (sem duplicar). */
+/** Marca o nome como utilizado nesta sessão. */
 async function registrarNomeUtilizado(nome) {
-  if (await nomeJaUtilizado(nome)) return;
   const lista = lerNomesGuardados();
+
+  if (lista.some(function (usado) {
+    return normalizarNome(usado) === normalizarNome(nome);
+  })) {
+    return;
+  }
+
   lista.push(nome);
   gravarNomesGuardados(lista);
 }
 
-/** Libera um nome (usado quando a partida é descartada na pergunta 1). */
+/** Libera o nome local quando a partida é descartada. */
 async function liberarNomeUtilizado(nome) {
   const chave = normalizarNome(nome);
-  gravarNomesGuardados(lerNomesGuardados().filter(function (usado) { return normalizarNome(usado) !== chave; }));
+
+  gravarNomesGuardados(
+    lerNomesGuardados().filter(function (usado) {
+      return normalizarNome(usado) !== chave;
+    })
+  );
 }
+
 
 /** Escolhe um apelido ao acaso entre os disponíveis (evita repetir o que já está no campo). */
 function sortearApelido(disponiveis, atual) {
