@@ -1045,3 +1045,257 @@ body[data-tela="resposta"] #faixa-colecao { display: flex; }
     animation: none;
   }
 }
+
+
+/* ---------- AJUSTES RESPONSIVOS: CELULAR ---------- */
+/* Estas regras só entram em telas estreitas; o layout do PC permanece igual. */
+@media (max-width: 600px) {
+  html {
+    font-size: clamp(11px, calc(2.2vw + 3px), 15px);
+  }
+
+  #jogo {
+    width: 100%;
+    min-width: 0;
+    padding: 4.2rem 1rem calc(var(--areia) + 1rem);
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .tela,
+  .painel,
+  .painel-nome,
+  .capa-grupo,
+  .painel-ranking,
+  #painel-resultado {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .tela {
+    gap: 0.8rem;
+    justify-content: flex-start;
+  }
+
+  .painel,
+  .painel-nome {
+    padding: 1rem;
+  }
+
+  /* Textos podem quebrar linha em vez de escapar das caixas. */
+  .painel,
+  .painel *,
+  .tela,
+  .tela * {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .titulo .linha1 {
+    font-size: clamp(2rem, 8vw, 3rem);
+  }
+
+  .titulo .linha2 {
+    font-size: clamp(2.8rem, 13vw, 4.4rem);
+  }
+
+  #tela-capa .titulo .linha1 {
+    font-size: clamp(1.8rem, 7vw, 2.4rem);
+  }
+
+  #tela-capa .titulo .linha2 {
+    font-size: clamp(2.5rem, 11vw, 3.8rem);
+  }
+
+  .subtitulo {
+    font-size: 1.2rem;
+    letter-spacing: 0.15em;
+    text-align: center;
+  }
+
+  .capa-tema {
+    max-width: 100%;
+    padding: 0.4rem 0.7rem;
+    font-size: 1.35rem;
+    text-align: center;
+  }
+
+  .capa-centro {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .bandeira {
+    width: 7rem;
+  }
+
+  .capa-grupo {
+    padding: 0.7rem;
+  }
+
+  .capa-grupo-topo {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .capa-nomes {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.45rem;
+  }
+
+  .capa-nomes li {
+    white-space: normal;
+  }
+
+  .botao-grande,
+  .botao-medio {
+    max-width: 100%;
+    min-width: 0;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .titulo-nome {
+    font-size: clamp(1.8rem, 7vw, 2.5rem);
+  }
+
+  .campo-nome {
+    max-width: 100%;
+    font-size: 1.7rem;
+  }
+
+  .aviso-nome,
+  .dica-nome,
+  .frase,
+  .pergunta p,
+  .alternativa,
+  .explicacao,
+  .certa,
+  .final-mensagem,
+  .status-ranking {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .pergunta p {
+    font-size: clamp(1.5rem, 5.5vw, 2rem);
+  }
+
+  .alternativas.duas-colunas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .alternativa {
+    gap: 0.6rem;
+    padding: 0.6rem;
+  }
+
+  #painel-resultado {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 0.8rem;
+    padding: 0.8rem;
+  }
+
+  .resultado-texto {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .resultado-texto h2 {
+    font-size: clamp(2rem, 8vw, 2.8rem);
+    overflow-wrap: anywhere;
+  }
+
+  .palco {
+    width: 10rem;
+    height: 10rem;
+  }
+
+  #faixa-colecao {
+    max-width: 100%;
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .faixa-slots {
+    max-width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  #tela-final,
+  #tela-ranking {
+    gap: 0.7rem;
+  }
+
+  .titulo-final,
+  .titulo-ranking {
+    max-width: 100%;
+    font-size: clamp(1.8rem, 7vw, 2.4rem);
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .album {
+    grid-template-columns: repeat(3, minmax(0, auto));
+    gap: 0.6rem 0.4rem;
+    max-width: 100%;
+    padding: 0.6rem;
+  }
+
+  .figurinha.media {
+    --tam: 4rem;
+  }
+
+  .final-botoes {
+    width: 100%;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .final-botoes .botao {
+    width: 100%;
+    font-size: 1.3rem;
+  }
+
+  .colunas-ranking {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.8rem;
+  }
+
+  .cab-ranking,
+  .linha-rank {
+    grid-template-columns: 1.8rem minmax(0, 1fr) 3rem 3rem;
+    gap: 0.35rem;
+  }
+
+  .cab-ranking {
+    padding: 0 0.4rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+  }
+
+  .linha-rank {
+    padding: 0.25rem 0.4rem;
+    font-size: 1rem;
+  }
+
+  .linha-rank .nome-rank {
+    min-width: 0;
+  }
+
+  .cronometro {
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+
+  .botao-voltar {
+    top: 0.5rem;
+    left: 0.5rem;
+  }
+}
+
