@@ -1,5 +1,6 @@
 /* ==================================================================
    MAR DE FIGURINHAS - LÓGICA DO JOGO
+   
    Tudo em JavaScript puro, sem bibliotecas e sem internet.
 
    Como este arquivo está organizado:
@@ -1216,16 +1217,32 @@ async function pedidoSupabase(caminho, opcoes) {
 }
 
 /** Envia um resultado ao Supabase. O tempo vai em segundos inteiros (igual ao que aparece na tela). */
+
 async function salvarResultadoOnline(resultado) {
-  await pedidoSupabase(SUPABASE_TABELA, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Prefer: "return=minimal" },
-    body: JSON.stringify({
-      nome: resultado.nome,
-      pontuacao: resultado.pontos,
-      tempo: Math.floor(resultado.tempoMs / 1000)
-    })
-  });
+  try {
+    await pedidoSupabase(SUPABASE_TABELA, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Prefer: "return=minimal"
+      },
+      body: JSON.stringify({
+        nome: resultado.nome,
+        pontuacao: resultado.pontos,
+        tempo: Math.floor(resultado.tempoMs / 1000)
+      })
+    });
+  } catch (erro) {
+    if (erro.message.includes("23505")) {
+      const duplicidade = new Error(
+        "Esse nome já está no ranking. Escolha outro nome."
+      );
+      duplicidade.codigo = "NOME_DUPLICADO";
+      throw duplicidade;
+    }
+
+    throw erro;
+  }
 }
 
 /** Converte uma linha da tabela "ranking" para o formato usado pelo jogo. */
@@ -1309,17 +1326,28 @@ function lerMelhoresLocais(limite) {
  * configurado, também no Supabase. Formato: { id, nome, pontos, tempoMs, criadoEm }.
  * Devolve { online: true/false, motivo } dizendo se o envio online funcionou.
  */
+
 async function salvarResultado(resultado) {
   salvarResultadoLocal(resultado);
-  if (!supabaseConfigurado()) return { online: false, motivo: "nao-configurado" };
+
+  if (!supabaseConfigurado()) {
+    return { online: false, motivo: "nao-configurado" };
+  }
+
   try {
     await salvarResultadoOnline(resultado);
     return { online: true, motivo: null };
   } catch (erro) {
     console.warn("Não foi possível enviar o resultado ao Supabase:", erro);
+
+    if (erro.codigo === "NOME_DUPLICADO") {
+      return { online: false, motivo: "nome-duplicado" };
+    }
+
     return { online: false, motivo: "falha" };
   }
 }
+
 
 /**
  * Devolve os melhores resultados: { resultados, origem, motivo }.
@@ -1449,15 +1477,20 @@ async function abrirRanking() {
     (i < porColuna ? esquerda : direita).appendChild(linha);
   }
 
-  // Aviso (só aparece quando o ranking online não está disponível)
+  
+  // Avisos sobre o ranking e o envio do resultado
   let aviso = "";
-  if (dados.origem === "local") {
+
+  if (envio && envio.motivo === "nome-duplicado") {
+    aviso = "Esse nome já está no ranking. Sua pontuação ficou salva apenas neste navegador.";
+  } else if (dados.origem === "local") {
     aviso = dados.motivo === "nao-configurado"
       ? "Ranking online ainda não configurado. Mostrando os resultados desta sessão."
       : "Sem conexão com o ranking online. Mostrando os resultados desta sessão.";
   } else if (envio && !envio.online) {
     aviso = "Seu resultado não foi enviado ao ranking online.";
   }
+
   const status = $("status-ranking");
   status.textContent = aviso;
   status.hidden = !aviso;
