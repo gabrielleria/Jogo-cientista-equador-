@@ -938,20 +938,44 @@ function gravarNomesGuardados(lista) {
 
 
 /** Devolve os nomes já utilizados no navegador e no ranking online. */
+
+/** Devolve os nomes locais e todos os nomes do ranking online. */
 async function listarNomesUtilizados() {
-  const nomesLocais = lerNomesGuardados();
+  const nomes = lerNomesGuardados().slice();
+  const tamanhoPagina = 500;
+  let inicio = 0;
 
-  const resposta = await pedidoSupabase(
-    SUPABASE_TABELA + "?select=nome",
-    { method: "GET", headers: {} }
-  );
+  while (true) {
+    const resposta = await pedidoSupabase(
+      SUPABASE_TABELA + "?select=nome&order=id.asc",
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Range-Unit": "items",
+          Range: inicio + "-" + (inicio + tamanhoPagina - 1)
+        }
+      }
+    );
 
-  const registros = await resposta.json();
-  const nomesOnline = registros.map(function (registro) {
-    return registro.nome;
-  });
+    const registros = await resposta.json();
 
-  return [...new Set([...nomesLocais, ...nomesOnline])];
+    if (!Array.isArray(registros)) {
+      throw new Error("Resposta inesperada do Supabase");
+    }
+
+    registros.forEach(function (registro) {
+      nomes.push(registro.nome);
+    });
+
+    if (registros.length < tamanhoPagina) {
+      break;
+    }
+
+    inicio += tamanhoPagina;
+  }
+
+  return [...new Set(nomes)];
 }
 
 /** Verifica se o nome já existe localmente ou no ranking online. */
