@@ -1006,23 +1006,40 @@ function irParaNome() {
 }
 
 /** Botão SORTEAR NOME: coloca um apelido no campo (que ainda pode ser editado). */
+
 async function sortearNome() {
   const campo = $("campo-nome");
-  const usados = (await listarNomesUtilizados()).map(normalizarNome);
-  const disponiveis = APELIDOS.filter(function (apelido) {
-    return usados.indexOf(normalizarNome(apelido)) === -1;
-  });
+  const aviso = $("aviso-nome");
 
-  // Acabaram os apelidos: avisa e sugere a alternativa, sem repetir nenhum nome
-  if (disponiveis.length === 0) {
-    $("aviso-nome").textContent = "Acabaram os apelidos disponíveis! Digite o seu próprio nome.";
+  try {
+    aviso.textContent = "Verificando apelidos disponíveis...";
+
+    const usados = (await listarNomesUtilizados()).map(normalizarNome);
+
+    const disponiveis = APELIDOS.filter(function (apelido) {
+      return usados.indexOf(normalizarNome(apelido)) === -1;
+    });
+
+    if (disponiveis.length === 0) {
+      aviso.textContent =
+        "Todos os apelidos estão ocupados! Digite um nome próprio.";
+      campo.focus({ preventScroll: true });
+      return;
+    }
+
+    campo.value = sortearApelido(
+      disponiveis,
+      limparNome(campo.value)
+    );
+
+    aviso.textContent = "";
     campo.focus({ preventScroll: true });
-    return;
-  }
 
-  campo.value = sortearApelido(disponiveis, limparNome(campo.value));
-  $("aviso-nome").textContent = "";
-  campo.focus({ preventScroll: true });
+  } catch (erro) {
+    console.error("Erro ao consultar apelidos:", erro);
+    aviso.textContent =
+      "Não foi possível consultar os apelidos. Confira a conexão e tente novamente.";
+  }
 }
 
 let verificandoNome = false; // impede dois cliques seguidos de começarem duas partidas
