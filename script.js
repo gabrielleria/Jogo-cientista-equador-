@@ -1028,28 +1028,50 @@ async function sortearNome() {
 let verificandoNome = false; // impede dois cliques seguidos de começarem duas partidas
 
 /** Botão JOGAR da tela de nome: só começa com um nome que ainda não foi usado. */
+
 async function comecarPartida() {
   if (verificandoNome) return;
   verificandoNome = true;
+
+  const campo = $("campo-nome");
+  const aviso = $("aviso-nome");
+
   try {
-    const campo = $("campo-nome");
     const nome = limparNome(campo.value);
+
     if (!nome) {
-      $("aviso-nome").textContent = "Digite um nome ou sorteie um!";
+      aviso.textContent = "Digite um nome ou sorteie um!";
       campo.focus({ preventScroll: true });
       return;
     }
-    if (await nomeJaUtilizado(nome)) {
-      $("aviso-nome").textContent = "\u201C" + nome + "\u201D já foi usado nesta sessão. Escolha outro nome ou sorteie um!";
+
+    let jaUtilizado;
+
+    try {
+      jaUtilizado = await nomeJaUtilizado(nome);
+    } catch (erro) {
+      console.error("Erro ao verificar nome:", erro);
+      aviso.textContent =
+        "Não foi possível verificar o nome. Confira a conexão e tente novamente.";
+      return;
+    }
+
+    if (jaUtilizado) {
+      aviso.textContent =
+        "\u201C" + nome +
+        "\u201D já aparece no ranking ou foi usado nesta sessão. Escolha outro nome!";
       campo.focus({ preventScroll: true });
       return;
     }
-    await registrarNomeUtilizado(nome); // o nome fica reservado a partir de agora
+
+    await registrarNomeUtilizado(nome);
     iniciarPartida(nome);
+
   } finally {
     verificandoNome = false;
   }
 }
+
 
 /* ------------------------------------------------------------------
    12. CRONÔMETRO E PONTUAÇÃO
