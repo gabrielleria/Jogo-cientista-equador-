@@ -870,14 +870,24 @@ function voltar() {
    vai começar: a cada nova partida o campo volta vazio.
    Um nome não pode se repetir na sessão da aba (sorteado ou digitado).
    ------------------------------------------------------------------ */
+
 const APELIDOS = [
   "PolvoNinja", "BaiacuSupremo", "TartarugaTurbo", "ReiDosOceanos",
   "RainhaDoRecife", "CapitãoCoral", "ÁguaVivaVeloz", "CaranguejoCraque",
   "EstrelaCósmica", "MestreDosMares", "PeixeRelâmpago", "BaiacuBravo",
   "PolvoGamer", "TartarugaNinja", "ExploradorAbissal", "SuperCoral",
   "PirataDoRecife", "MergulhadorPro", "CaranguejoRei", "EstrelaBrilhante",
-  "TubarãoSimpático", "DragãoMarinho", "ReiDoRecife", "CavaloMarinhoMax"
+  "TubarãoSimpático", "DragãoMarinho", "ReiDoRecife", "CavaloMarinhoMax",
+
+  "GolfinhoVeloz", "SereiaDoMar", "GuardiaoAzul", "CoralPixel",
+  "PeixinhoAstral", "MantaRadiante", "TubaraoPixel", "NautilusNinja",
+  "MarujoDigital", "ConchaDourada", "RecifeSecreto", "OrcaLendaria",
+  "CavaloMarinhoPro", "LulaLuminosa", "CamaraoTurbo", "FocaExploradora",
+  "ArraiaFantasma", "PeixeLua", "MergulhoMestre", "KrakenDoBem",
+  "EstrelaDoMar", "BaleiaPixel", "SiriCampeao", "OceanoGamer",
+  "NaveganteAzul", "PlanctonPower"
 ];
+
 
 /** Tira espaços sobrando do começo, do fim e do meio do nome. */
 function limparNome(texto) {
