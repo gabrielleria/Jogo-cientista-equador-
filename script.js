@@ -156,7 +156,7 @@ const PIXELS_BAIACU = [
   "....S..SS..S....",
   "....KKKKKKKK....",
   "..SKYYYYYYYYKS..",
-  "..KYYYYYYYYYYK..",
+  "..KYHHYYYYYYYK..",
   ".SKYEBYYYYBEYKS.",
   "..KYEBYYYYBEYK..",
   "..KYPYYMMYYPYK..",
@@ -1063,17 +1063,120 @@ function pararCronometro() {
 
 /* ------------------------------------------------------------------
    13. RANKING
-   Guarda os resultados (nome, pontos e tempo) e mostra os 5 melhores.
+   Guarda os resultados (nome, pontos e tempo) e mostra os 10 melhores.
 
    O armazenamento está todo na "CAMADA DE ARMAZENAMENTO" logo abaixo.
-   Por enquanto usa o sessionStorage: os resultados duram enquanto a aba
-   estiver aberta (sobrevivem a F5) e NÃO vão para o localStorage.
-   Para trocar por um banco de dados no futuro, basta reescrever as
-   quatro funções dessa camada; o resto do jogo não precisa mudar.
+   - sessionStorage: reserva da sessão (sobrevive a F5, NÃO vai para o localStorage).
+   - Supabase: ranking online compartilhado (preencha SUPABASE_URL e
+     SUPABASE_CHAVE_PUBLICA). Sem isso, o jogo usa só o sessionStorage.
    ------------------------------------------------------------------ */
-const RANKING_TAMANHO = 5;   // quantos resultados aparecem no ranking
+const RANKING_TAMANHO = 10;  // quantos resultados aparecem no ranking (5 por coluna)
 const LIMITE_GUARDADO = 50;  // quantos resultados ficam guardados no máximo
 const CHAVE_RANKING = "marDeFigurinhas.resultados";
+
+/* ===== CONFIGURAÇÃO DO SUPABASE =====
+   Preencha as duas linhas abaixo com os dados do SEU projeto
+   (Supabase > Project Settings > API):
+     - SUPABASE_URL: o endereço do projeto, por exemplo "https://xxxx.supabase.co"
+     - SUPABASE_CHAVE_PUBLICA: a chave PÚBLICA (anon ou publishable).
+   NUNCA coloque aqui a chave "service_role" nem qualquer chave secreta:
+   tudo que está neste arquivo fica visível para quem abrir o jogo.
+   Enquanto as duas linhas estiverem vazias, o jogo usa só o ranking da sessão. */
+const SUPABASE_URL = "https://ipnzrwclrjlubodqxkve.supabase.co";
+const SUPABASE_CHAVE_PUBLICA = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlwbnpyd2NscmpsdWJvZHF4a3ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxMjU5NDIsImV4cCI6MjEwODcwMTk0Mn0.g6A92ICgeypZNumNIB7HuEhXSi_d-m3BM0x5qyScoWc";
+const SUPABASE_TABELA = "ranking";      // colunas: id, nome, pontuacao, tempo (segundos), criado_em
+const SUPABASE_TEMPO_LIMITE_MS = 8000;  // desiste de uma conexão que demore demais
+
+/** Detecta chaves secretas coladas por engano (elas nunca podem ser usadas aqui). */
+function chaveEhSecreta(chave) {
+  if (chave.indexOf("sb_secret_") === 0) return true;
+  if (chave.indexOf("eyJ") === 0) {
+    try {
+      const carga = JSON.parse(atob(chave.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+      return carga.role === "service_role";
+    } catch (erro) {
+      return false;
+    }
+  }
+  return false;
+}
+
+/** O Supabase está pronto para uso? (URL e chave pública preenchidas) */
+function supabaseConfigurado() {
+  const url = SUPABASE_URL.trim();
+  const chave = SUPABASE_CHAVE_PUBLICA.trim();
+  if (!url || !chave || url.indexOf("https://") !== 0) return false;
+  if (chaveEhSecreta(chave)) {
+    console.error("A chave do Supabase é secreta (service_role). Use apenas a chave pública (anon/publishable).");
+    return false;
+  }
+  return true;
+}
+
+/** Faz um pedido à API do Supabase (sem bibliotecas; só o fetch do navegador). */
+async function pedidoSupabase(caminho, opcoes) {
+  const chave = SUPABASE_CHAVE_PUBLICA.trim();
+  const cabecalhos = Object.assign({ apikey: chave }, opcoes.headers || {});
+  if (chave.indexOf("eyJ") === 0) cabecalhos.Authorization = "Bearer " + chave; // chaves no formato JWT
+
+  const controle = new AbortController();
+  const cronometroDoPedido = setTimeout(function () { controle.abort(); }, SUPABASE_TEMPO_LIMITE_MS);
+  try {
+    const resposta = await fetch(SUPABASE_URL.trim().replace(/\/+$/, "") + "/rest/v1/" + caminho, {
+      method: opcoes.method,
+      headers: cabecalhos,
+      body: opcoes.body,
+      signal: controle.signal
+    });
+    if (!resposta.ok) {
+  throw new Error("HTTP " + resposta.status + ": " + await resposta.text());
+}
+    return resposta;
+  } finally {
+    clearTimeout(cronometroDoPedido);
+  }
+}
+
+/** Envia um resultado ao Supabase. O tempo vai em segundos inteiros (igual ao que aparece na tela). */
+async function salvarResultadoOnline(resultado) {
+  await pedidoSupabase(SUPABASE_TABELA, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Prefer: "return=minimal" },
+    body: JSON.stringify({
+      nome: resultado.nome,
+      pontuacao: resultado.pontos,
+      tempo: Math.floor(resultado.tempoMs / 1000)
+    })
+  });
+}
+
+/** Converte uma linha da tabela "ranking" para o formato usado pelo jogo. */
+function converterLinhaSupabase(linha) {
+  const pontos = Number(linha.pontuacao);
+  const tempo = Number(linha.tempo);
+  const criado = Date.parse(linha.criado_em);
+  if (typeof linha.nome !== "string" || !Number.isFinite(pontos) || !Number.isFinite(tempo)) return null;
+  return {
+    id: "db-" + linha.id,
+    nome: linha.nome,
+    pontos: pontos,
+    tempoMs: tempo * 1000,
+    criadoEm: Number.isFinite(criado) ? criado : 0
+  };
+}
+
+/**
+ * Busca os melhores resultados no Supabase. A própria consulta já ordena:
+ * maior pontuação, menor tempo e, no empate dos dois, o enviado mais recentemente.
+ */
+async function buscarMelhoresOnline(limite) {
+  const consulta = SUPABASE_TABELA + "?select=id,nome,pontuacao,tempo,criado_em" +
+    "&order=pontuacao.desc,tempo.asc,criado_em.desc&limit=" + limite;
+  const resposta = await pedidoSupabase(consulta, { method: "GET", headers: { Accept: "application/json" } });
+  const linhas = await resposta.json();
+  if (!Array.isArray(linhas)) throw new Error("Resposta inesperada do Supabase");
+  return linhas.map(converterLinhaSupabase).filter(function (r) { return r !== null; });
+}
 
 /* ===== CAMADA DE ARMAZENAMENTO (a parte que será trocada pelo banco) ===== */
 
@@ -1111,31 +1214,62 @@ function gravarTodosOsResultados(lista) {
   }
 }
 
-/**
- * Salva UM resultado. Formato: { id, nome, pontos, tempoMs, criadoEm }.
- * É "async" de propósito: um banco de dados também será assíncrono.
- */
-async function salvarResultado(resultado) {
+/** Guarda UM resultado no sessionStorage (reserva local da sessão). */
+function salvarResultadoLocal(resultado) {
   const lista = lerTodosOsResultados();
   lista.push(resultado);
   gravarTodosOsResultados(ordenarResultados(lista).slice(0, LIMITE_GUARDADO));
-  return resultado;
 }
 
-/** Devolve os melhores resultados, já ordenados (também "async"). */
-async function obterMelhoresResultados(limite) {
+/** Melhores resultados guardados no sessionStorage (já ordenados). */
+function lerMelhoresLocais(limite) {
   return ordenarResultados(lerTodosOsResultados()).slice(0, limite);
+}
+
+/**
+ * Salva UM resultado: sempre no sessionStorage e, se o Supabase estiver
+ * configurado, também no Supabase. Formato: { id, nome, pontos, tempoMs, criadoEm }.
+ * Devolve { online: true/false, motivo } dizendo se o envio online funcionou.
+ */
+async function salvarResultado(resultado) {
+  salvarResultadoLocal(resultado);
+  if (!supabaseConfigurado()) return { online: false, motivo: "nao-configurado" };
+  try {
+    await salvarResultadoOnline(resultado);
+    return { online: true, motivo: null };
+  } catch (erro) {
+    console.warn("Não foi possível enviar o resultado ao Supabase:", erro);
+    return { online: false, motivo: "falha" };
+  }
+}
+
+/**
+ * Devolve os melhores resultados: { resultados, origem, motivo }.
+ * origem "online" = veio do Supabase; "local" = veio do sessionStorage
+ * (Supabase não configurado ou fora do ar; "motivo" diz qual dos dois).
+ */
+async function obterMelhoresResultados(limite) {
+  if (!supabaseConfigurado()) {
+    return { resultados: lerMelhoresLocais(limite), origem: "local", motivo: "nao-configurado" };
+  }
+  try {
+    return { resultados: await buscarMelhoresOnline(limite), origem: "online", motivo: null };
+  } catch (erro) {
+    console.warn("Não foi possível ler o ranking do Supabase:", erro);
+    return { resultados: lerMelhoresLocais(limite), origem: "local", motivo: "falha" };
+  }
 }
 
 /* ===== REGRAS DO RANKING (valem com qualquer armazenamento) ===== */
 
 /**
  * Maior pontuação primeiro. Se empatar, menor tempo na frente.
- * Se ainda empatar, quem terminou antes fica na frente.
+ * Se ainda empatar, o resultado enviado mais recentemente fica na frente.
+ * (O Supabase usa a mesma regra na consulta; esta função vale para o ranking local.)
  */
 function ordenarResultados(lista) {
   return lista.slice().sort(function (a, b) {
-    return (b.pontos - a.pontos) || (a.tempoMs - b.tempoMs) || (a.criadoEm - b.criadoEm);
+    return (b.pontos - a.pontos) || (a.tempoMs - b.tempoMs) || (b.criadoEm - a.criadoEm);
   });
 }
 
@@ -1166,7 +1300,7 @@ function travarBotoes(botoes) {
 }
 
 /** Cria uma linha do ranking (resultado = null deixa a posição vazia). */
-function criarLinhaRanking(posicao, resultado, idDestaque) {
+function criarLinhaRanking(posicao, resultado, destaque) {
   const linha = document.createElement("div");
   linha.className = "linha-rank pos-" + posicao + (resultado ? "" : " vazia");
 
@@ -1186,7 +1320,7 @@ function criarLinhaRanking(posicao, resultado, idDestaque) {
   tempo.className = "tempo";
   tempo.textContent = resultado ? formatarTempo(resultado.tempoMs) : "--:--";
 
-  if (resultado && resultado.id === idDestaque) {
+  if (resultado && destaque) {
     linha.classList.add("destaque");
     const voce = document.createElement("span");
     voce.className = "voce";
@@ -1201,19 +1335,54 @@ function criarLinhaRanking(posicao, resultado, idDestaque) {
   return linha;
 }
 
+/** Acha, na lista, o resultado da partida que acabou de terminar (-1 se não achar). */
+function acharMeuResultado(lista, origem, envio) {
+  if (!estado) return -1;
+  for (let i = 0; i < lista.length; i++) {
+    if (lista[i].id === estado.resultadoId) return i;
+  }
+  // No ranking online o id é o do banco; compara nome, pontos e tempo (só se o envio deu certo)
+  if (origem === "online" && envio && envio.online) {
+    const segundos = Math.floor(estado.tempoTotalMs / 1000);
+    for (let i = 0; i < lista.length; i++) {
+      if (lista[i].nome === estado.jogador && lista[i].pontos === estado.pontos &&
+          Math.floor(lista[i].tempoMs / 1000) === segundos) return i;
+    }
+  }
+  return -1;
+}
+
 /** Botão VER RANKING (tela final): busca os melhores e abre a tela. */
 async function abrirRanking() {
   const partida = estado ? estado.id : null;
-  if (estado && estado.salvando) await estado.salvando; // garante que o resultado já foi guardado
-  const melhores = await obterMelhoresResultados(RANKING_TAMANHO);
+  const envio = (estado && estado.salvando) ? await estado.salvando : null; // espera o envio terminar
+  const dados = await obterMelhoresResultados(RANKING_TAMANHO);
   if (estado && estado.id !== partida) return; // outra partida começou nesse meio tempo
 
-  const lista = $("lista-ranking");
-  lista.innerHTML = "";
-  const idDestaque = estado ? estado.resultadoId : null;
+  // Duas colunas: 1º ao 5º à esquerda e 6º ao 10º à direita
+  const esquerda = $("lista-ranking-esq");
+  const direita = $("lista-ranking-dir");
+  esquerda.innerHTML = "";
+  direita.innerHTML = "";
+  const porColuna = RANKING_TAMANHO / 2;
+  const meu = acharMeuResultado(dados.resultados, dados.origem, envio);
   for (let i = 0; i < RANKING_TAMANHO; i++) {
-    lista.appendChild(criarLinhaRanking(i + 1, melhores[i] || null, idDestaque));
+    const linha = criarLinhaRanking(i + 1, dados.resultados[i] || null, i === meu);
+    (i < porColuna ? esquerda : direita).appendChild(linha);
   }
+
+  // Aviso (só aparece quando o ranking online não está disponível)
+  let aviso = "";
+  if (dados.origem === "local") {
+    aviso = dados.motivo === "nao-configurado"
+      ? "Ranking online ainda não configurado. Mostrando os resultados desta sessão."
+      : "Sem conexão com o ranking online. Mostrando os resultados desta sessão.";
+  } else if (envio && !envio.online) {
+    aviso = "Seu resultado não foi enviado ao ranking online.";
+  }
+  const status = $("status-ranking");
+  status.textContent = aviso;
+  status.hidden = !aviso;
 
   mostrarTela("ranking");
   travarBotoes([$("btn-ranking-menu")]);

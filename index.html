@@ -143,15 +143,26 @@
       </div>
     </section>
 
-    <!-- TELA 6 - RANKING (os 5 melhores resultados) -->
+    <!-- TELA 6 - RANKING (os 10 melhores resultados, em duas colunas) -->
     <section id="tela-ranking" class="tela">
       <h2 class="titulo-ranking">RANKING</h2>
       <div class="painel painel-ranking">
-        <div class="cab-ranking">
-          <span>#</span><span>JOGADOR</span><span class="dir">PONTOS</span><span class="dir">TEMPO</span>
+        <div class="colunas-ranking">
+          <div class="coluna-ranking">
+            <div class="cab-ranking">
+              <span>#</span><span>JOGADOR</span><span class="dir">PONTOS</span><span class="dir">TEMPO</span>
+            </div>
+            <div id="lista-ranking-esq" class="lista-ranking"></div>
+          </div>
+          <div class="coluna-ranking">
+            <div class="cab-ranking">
+              <span>#</span><span>JOGADOR</span><span class="dir">PONTOS</span><span class="dir">TEMPO</span>
+            </div>
+            <div id="lista-ranking-dir" class="lista-ranking"></div>
+          </div>
         </div>
-        <div id="lista-ranking" class="lista-ranking"></div>
       </div>
+      <p id="status-ranking" class="status-ranking" role="status" hidden></p>
       <button id="btn-ranking-menu" class="botao botao-grande" type="button">MENU</button>
     </section>
 

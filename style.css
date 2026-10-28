@@ -903,7 +903,7 @@ body[data-tela="resposta"] #faixa-colecao { display: flex; }
 }
 
 /* ---------- 10c. TELA 6 - RANKING ---------- */
-#tela-ranking { max-width: 52rem; gap: 0.6rem; }
+#tela-ranking { max-width: 64rem; gap: 0.6rem; }
 
 .titulo-ranking {
   font-family: var(--fonte-titulo);
@@ -916,24 +916,32 @@ body[data-tela="resposta"] #faixa-colecao { display: flex; }
 }
 .painel-ranking {
   width: 100%;
+  padding: 0.7rem 1rem 0.8rem;
+}
+.colunas-ranking {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+.coluna-ranking {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  padding: 0.7rem 1rem 0.8rem;
 }
 .cab-ranking,
 .linha-rank {
   display: grid;
-  grid-template-columns: 2.8rem 1fr 7rem 7rem;
+  grid-template-columns: 2rem 1fr 4.6rem 4.6rem;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.6rem;
 }
 .cab-ranking {
-  padding: 0 1.15rem;
+  padding: 0 0.9rem;
   font-family: var(--fonte-titulo);
   font-weight: 900;
-  font-size: 1.05rem;
-  letter-spacing: 0.15em;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
   color: var(--verde-agua);
 }
 .cab-ranking .dir { text-align: right; }
@@ -941,8 +949,8 @@ body[data-tela="resposta"] #faixa-colecao { display: flex; }
 .lista-ranking { display: flex; flex-direction: column; gap: 0.4rem; }
 
 .linha-rank {
-  padding: 0.2rem 0.9rem;
-  font-size: 1.5rem;
+  padding: 0.2rem 0.7rem;
+  font-size: 1.3rem;
   font-weight: 800;
   background: var(--azul-medio);
   border: 0.25rem solid var(--azul-profundo);
@@ -950,11 +958,11 @@ body[data-tela="resposta"] #faixa-colecao { display: flex; }
 .linha-rank .pos {
   display: grid;
   place-items: center;
-  width: 2.3rem;
-  height: 2.3rem;
+  width: 2rem;
+  height: 2rem;
   font-family: var(--fonte-titulo);
   font-weight: 900;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   color: var(--azul-escuro);
   background: var(--ciano);
 }
@@ -977,6 +985,16 @@ body[data-tela="resposta"] #faixa-colecao { display: flex; }
 .linha-rank .pts { color: var(--amarelo); }
 .linha-rank .tempo { color: var(--verde-agua); }
 
+/* Aviso quando o ranking online não está disponível */
+.status-ranking {
+  max-width: 100%;
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--amarelo);
+}
+
 /* Posições ainda sem resultado */
 .linha-rank.vazia { opacity: 0.55; }
 .linha-rank.vazia .pos { color: #5F93B3; background: var(--azul-profundo); }
@@ -984,10 +1002,10 @@ body[data-tela="resposta"] #faixa-colecao { display: flex; }
 /* Resultado da partida que acabou de terminar */
 .linha-rank.destaque { background: #18587F; border-color: var(--amarelo); }
 .voce {
-  margin-left: 0.6rem;
-  padding: 0 0.4rem;
+  margin-left: 0.4rem;
+  padding: 0 0.3rem;
   font-family: var(--fonte-titulo);
-  font-size: 0.95rem;
+  font-size: 0.8rem;
   color: var(--azul-escuro);
   background: var(--amarelo);
   vertical-align: middle;
