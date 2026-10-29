@@ -842,6 +842,9 @@ function atualizarSetaVoltar() {
   $("btn-voltar").hidden = !visivel;
 }
 
+// Guarda de qual tela o ranking foi aberto, para a seta voltar ao lugar certo.
+let telaAnteriorRanking = "final";
+
 /** Clique na seta. */
 function voltar() {
   const tela = document.body.dataset.tela;
@@ -856,7 +859,7 @@ function voltar() {
   } else if (tela === "nome") {
     mostrarTela("menu");
   } else if (tela === "ranking") {
-    mostrarTela("final"); // a tela final continua como estava, sem registrar nada de novo
+    mostrarTela(telaAnteriorRanking); // volta à tela de onde o ranking foi aberto
   } else if (tela === "quiz" && estaNaPrimeiraPerguntaSemResposta()) {
     pararCronometro();
     liberarNomeUtilizado(estado.jogador); // o nome volta a ficar disponível
@@ -1482,44 +1485,55 @@ function acharMeuResultado(lista, origem, envio) {
   return -1;
 }
 
-/** Botão VER RANKING (tela final): busca os melhores e abre a tela. */
+/** Abre o ranking a partir do menu ou da tela final, sem iniciar/alterar uma partida. */
 async function abrirRanking() {
+  const telaAtual = document.body.dataset.tela;
+  telaAnteriorRanking = telaAtual === "menu" ? "menu" : "final";
   const partida = estado ? estado.id : null;
-  const envio = (estado && estado.salvando) ? await estado.salvando : null; // espera o envio terminar
-  const dados = await obterMelhoresResultados(RANKING_TAMANHO);
-  if (estado && estado.id !== partida) return; // outra partida começou nesse meio tempo
 
-  // Duas colunas: 1º ao 5º à esquerda e 6º ao 10º à direita
   const esquerda = $("lista-ranking-esq");
   const direita = $("lista-ranking-dir");
+  const status = $("status-ranking");
   esquerda.innerHTML = "";
   direita.innerHTML = "";
-  const porColuna = RANKING_TAMANHO / 2;
-  const meu = acharMeuResultado(dados.resultados, dados.origem, envio);
-  for (let i = 0; i < RANKING_TAMANHO; i++) {
-    const linha = criarLinhaRanking(i + 1, dados.resultados[i] || null, i === meu);
-    (i < porColuna ? esquerda : direita).appendChild(linha);
-  }
-
-  
-  // Avisos sobre o ranking e o envio do resultado
-  let aviso = "";
-
-  if (envio && envio.motivo === "nome-duplicado") {
-    aviso = "Esse nome já está no ranking. Sua pontuação ficou salva apenas neste navegador.";
-  } else if (dados.origem === "local") {
-    aviso = dados.motivo === "nao-configurado"
-      ? "Ranking online ainda não configurado. Mostrando os resultados desta sessão."
-      : "Sem conexão com o ranking online. Mostrando os resultados desta sessão.";
-  } else if (envio && !envio.online) {
-    aviso = "Seu resultado não foi enviado ao ranking online.";
-  }
-
-  const status = $("status-ranking");
-  status.textContent = aviso;
-  status.hidden = !aviso;
-
+  status.textContent = "Carregando ranking...";
+  status.hidden = false;
   mostrarTela("ranking");
+
+  try {
+    const envio = (estado && estado.salvando) ? await estado.salvando : null;
+    const dados = await obterMelhoresResultados(RANKING_TAMANHO);
+    if (estado && estado.id !== partida) return; // outra partida começou nesse meio tempo
+
+    const porColuna = RANKING_TAMANHO / 2;
+    const meu = acharMeuResultado(dados.resultados, dados.origem, envio);
+    for (let i = 0; i < dados.resultados.length && i < RANKING_TAMANHO; i++) {
+      const linha = criarLinhaRanking(i + 1, dados.resultados[i], i === meu);
+      (i < porColuna ? esquerda : direita).appendChild(linha);
+    }
+
+    const avisos = [];
+    if (dados.resultados.length === 0) {
+      avisos.push("Ainda não existem jogadores no ranking. Seja o primeiro a jogar!");
+    }
+    if (envio && envio.motivo === "nome-duplicado") {
+      avisos.push("Esse nome já está no ranking. Sua pontuação ficou salva apenas neste navegador.");
+    } else if (dados.origem === "local") {
+      avisos.push(dados.motivo === "nao-configurado"
+        ? "Ranking online ainda não configurado. Mostrando os resultados desta sessão."
+        : "Não foi possível consultar o ranking online. Mostrando os resultados desta sessão.");
+    } else if (envio && !envio.online) {
+      avisos.push("Seu resultado não foi enviado ao ranking online.");
+    }
+
+    status.textContent = avisos.join(" ");
+    status.hidden = !status.textContent;
+  } catch (erro) {
+    console.error("Não foi possível abrir o ranking:", erro);
+    status.textContent = "Não foi possível carregar o ranking agora. Confira sua conexão e tente novamente.";
+    status.hidden = false;
+  }
+
   travarBotoes([$("btn-ranking-menu")]);
 }
 
@@ -1532,6 +1546,7 @@ $("btn-voltar").innerHTML = desenharSprite(PIXELS_SETA, PALETA_SETA, false);
 $("btn-voltar").addEventListener("click", voltar);
 $("btn-iniciar").addEventListener("click", irParaMenu);
 $("btn-jogar").addEventListener("click", irParaNome);
+$("btn-ranking-menu-principal").addEventListener("click", abrirRanking);
 $("btn-sortear").addEventListener("click", sortearNome);
 $("btn-comecar").addEventListener("click", comecarPartida);
 $("campo-nome").addEventListener("keydown", function (evento) {
