@@ -290,61 +290,60 @@ function buscarFigurinha(id) {
    ------------------------------------------------------------------ */
 const PERGUNTAS = [
   {
-    texto: "Pergunta 1",
-    alternativas: ["Resposta certa 1", "Resposta errada 1A", "Resposta errada 1B"],
+    texto: "Qual é a principal área de pesquisa de Patricia Castillo-Briceno?",
+    alternativas: ["A acidificação dos oceanos e a saúde dos animais marinhos", "A exploração de minerais em desertos", "A astronomia e os planetas"],
     correta: 0,
-    explicacao: "Explicação 1",
+    explicacao: " Ela estuda como a acidificação dos oceanos afeta a saúde dos animais marinhos.",
     figurinha: "peixe"
   },
   {
-    texto: "Pergunta 2",
-    alternativas: ["Resposta certa 2", "Resposta errada 2A", "Resposta errada 2B"],
+    texto: "O que causa principalmente a acidificação dos oceanos?",
+    alternativas: ["A absorção de CO₂ atmosférico pela água do mar", "A diminuição da luz solar", "O aumento da quantidade de areia no fundo do mar"],
     correta: 0,
-    explicacao: "Explicação 2",
+    explicacao: "O mar absorve CO₂ do ar, diminuindo o pH e aumentando a acidez da água.",
     figurinha: "polvo"
   },
   {
-    texto: "Pergunta 3",
-    alternativas: ["Resposta certa 3", "Resposta errada 3A", "Resposta errada 3B"],
+    texto: "Qual grupo de animais foi estudado por Patricia em pesquisas sobre os impactos da acidificação?",
+    alternativas: ["Camarões-brancos", "Aves migratórias ", "Répteis terrestres"],
     correta: 0,
-    explicacao: "Explicação 3",
+    explicacao: "Ela estudou camarões-brancos para observar os efeitos da acidificação no desenvolvimento deles.",
     figurinha: "coral"
   },
   {
-    texto: "Pergunta 4",
-    alternativas: ["Resposta certa 4", "Resposta errada 4A", "Resposta errada 4B"],
+    texto: "Como a acidificação pode afetar alguns animais marinhos?",
+    alternativas: ["Pode alterar seu crescimento, sua saúde e seu funcionamento fisiológico", "Faz com que todos cresçam mais rapidamente", "Impede que precisem de alimento"],
     correta: 0,
-    explicacao: "Explicação 4",
+    explicacao: "A acidificação pode afetar o crescimento, a saúde e o funcionamento do corpo dos animais.",
     figurinha: "aguaviva"
   },
   {
-    texto: "Pergunta 5",
-    alternativas: ["Resposta certa 5", "Resposta errada 5A", "Resposta errada 5B"],
+    texto: "Além da saúde, o que Patricia e seus colaboradores investigaram em peixes jovens? ",
+    alternativas: ["Seu comportamento e suas respostas à anestesia", "Sua capacidade de voar", "Sua adaptação à vida em desertos"],
     correta: 0,
-    explicacao: "Explicação 5",
+    explicacao: "A equipe investigou o comportamento de peixes jovens e suas reações à anestesia.",
     figurinha: "tartaruga"
   },
   {
-    texto: "Pergunta 6",
-    alternativas: ["Resposta certa 6", "Resposta errada 6A", "Resposta errada 6B"],
+    texto: "Qual é a formação e especialidade de Patricia Castillo-Briceno?",
+    alternativas: ["Bióloga marinha com doutorado em biomedicina", " Engenheira civil especializada em pontes", "Astrônoma especializada em galáxias "],
     correta: 0,
-    explicacao: "Explicação 6",
+    explicacao: "Ela é bióloga marinha com formação voltada ao funcionamento e à saúde dos organismos.",
     figurinha: "caranguejo"
   },
-  {
-    // Pergunta 7: a recompensa é a estrela-do-mar.
-    texto: "Pergunta 7",
-    alternativas: ["Resposta certa 7", "Resposta errada 7A", "Resposta errada 7B"],
+  { 
+    texto: "Por que os estudos sobre a acidificação são importantes para a alimentação humana?",
+    alternativas: ["Porque podem ajudar a compreender os impactos sobre espécies usadas na pesca e na aquicultura", "Porque eliminam a necessidade de proteger os oceanos", "Porque transformam a água salgada em água potável "],
     correta: 0,
-    explicacao: "Explicação 7",
+    explicacao: "Os estudos ajudam a entender os impactos sobre animais usados como alimento na pesca e na aquicultura. 
+",
     figurinha: "estrela"
   },
   {
-    // Pergunta 8: a recompensa é o baiacu.
-    texto: "Pergunta 8",
-    alternativas: ["Resposta certa 8", "Resposta errada 8A", "Resposta errada 8B"],
+    texto: "Em qual país Patricia Castillo-Briceno desenvolve suas pesquisas na Universidade Laica Eloy Alfaro de Manabí?",
+    alternativas: ["Equador", "Brasil", "Portugal"],
     correta: 0,
-    explicacao: "Explicação 8",
+    explicacao: "A universidade onde Patricia desenvolve suas pesquisas fica no Equador.",
     figurinha: "baiacu"
   }
 ];
