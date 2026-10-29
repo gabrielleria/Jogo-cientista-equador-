@@ -335,8 +335,7 @@ const PERGUNTAS = [
     texto: "Por que os estudos sobre a acidificação são importantes para a alimentação humana?",
     alternativas: ["Porque podem ajudar a compreender os impactos sobre espécies usadas na pesca e na aquicultura", "Porque eliminam a necessidade de proteger os oceanos", "Porque transformam a água salgada em água potável "],
     correta: 0,
-    explicacao: "Os estudos ajudam a entender os impactos sobre animais usados como alimento na pesca e na aquicultura. 
-",
+    explicacao:"Os estudos ajudam a entender os impactos sobre animais usados como alimento na pesca e na aquicultura.",
     figurinha: "estrela"
   },
   {
