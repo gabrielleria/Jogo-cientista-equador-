@@ -836,7 +836,7 @@ function estaNaPrimeiraPerguntaSemResposta() {
 /** Mostra ou esconde a seta de acordo com a tela atual. */
 function atualizarSetaVoltar() {
   const tela = document.body.dataset.tela;
-  const visivel = tela === "menu" || tela === "nome" || tela === "ranking" || (tela === "quiz" && estaNaPrimeiraPerguntaSemResposta());
+  const visivel = tela === "menu" || tela === "nome" || tela === "tutorial" || tela === "ranking" || (tela === "quiz" && estaNaPrimeiraPerguntaSemResposta());
   $("btn-voltar").hidden = !visivel;
 }
 
@@ -856,6 +856,9 @@ function voltar() {
     mostrarTela("capa");
   } else if (tela === "nome") {
     mostrarTela("menu");
+  } else if (tela === "tutorial") {
+    nomePendenteTutorial = "";
+    mostrarTela("nome", "campo-nome");
   } else if (tela === "ranking") {
     mostrarTela(telaAnteriorRanking); // volta à tela de onde o ranking foi aberto
   } else if (tela === "quiz" && estaNaPrimeiraPerguntaSemResposta()) {
@@ -1079,6 +1082,7 @@ async function sortearNome() {
 }
 
 let verificandoNome = false; // impede dois cliques seguidos de começarem duas partidas
+let nomePendenteTutorial = ""; // nome validado, aguardando confirmação do tutorial
 
 /** Botão JOGAR da tela de nome: só começa com um nome que ainda não foi usado. */
 
@@ -1117,8 +1121,8 @@ async function comecarPartida() {
       return;
     }
 
-    await registrarNomeUtilizado(nome);
-    iniciarPartida(nome);
+    nomePendenteTutorial = nome;
+    mostrarTela("tutorial", "btn-tutorial-jogar");
 
   } finally {
     verificandoNome = false;
@@ -1547,6 +1551,23 @@ $("btn-jogar").addEventListener("click", irParaNome);
 $("btn-ranking-menu-principal").addEventListener("click", abrirRanking);
 $("btn-sortear").addEventListener("click", sortearNome);
 $("btn-comecar").addEventListener("click", comecarPartida);
+$("btn-tutorial-jogar").addEventListener("click", async function () {
+  if (!nomePendenteTutorial) { mostrarTela("nome", "campo-nome"); return; }
+  const botao = $("btn-tutorial-jogar");
+  botao.disabled = true;
+  try {
+    await registrarNomeUtilizado(nomePendenteTutorial);
+    const nome = nomePendenteTutorial;
+    nomePendenteTutorial = "";
+    iniciarPartida(nome);
+  } catch (erro) {
+    console.error("Erro ao registrar nome:", erro);
+    mostrarTela("nome", "campo-nome");
+    $("aviso-nome").textContent = "Não foi possível iniciar. Tente novamente.";
+  } finally {
+    botao.disabled = false;
+  }
+});
 $("campo-nome").addEventListener("keydown", function (evento) {
   if (evento.key === "Enter") comecarPartida();
 });
